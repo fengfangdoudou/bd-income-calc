@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BD 收入计算器 · 2026年4月</title>
+<style>
+:root {
+  --green:#2d6a4f; --green-l:#52b788; --green-bg:#d8f3dc;
+  --blue:#1a73e8;  --blue-bg:#e8f4fd;
+  --orange:#e65100; --orange-bg:#fff3e0;
+  --purple:#5b21b6; --purple-bg:#f3e8ff;
+  --red:#e63946;   --red-bg:#fde8e8;
+  --gray:#6c757d;  --bg:#f4f6f8; --card:#fff;
+  --border:#dee2e6; --text:#212529;
+  --shadow:0 2px 16px rgba(0,0,0,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:linear-gradient(135deg,#1b4332 0%,#2d6a4f 55%,#40916c 100%);color:#fff;padding:36px 24px 28px;text-align:center}
+header h1{font-size:1.75rem;font-weight:900;letter-spacing:.5px}
+header p{margin-top:8px;font-size:.9rem;opacity:.8}
+.container{max-width:900px;margin:0 auto;padding:24px 16px 80px;display:flex;flex-direction:column;gap:20px}
+.card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.card-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.card-header h2{font-size:1.05rem;font-weight:700}
+.card-header .sub{font-size:.78rem;color:var(--gray);margin-top:2px}
+.card-body{padding:20px}
+.theme-blue .card-header{background:var(--blue-bg)}
+.theme-blue .card-icon{background:var(--blue);color:#fff}
+.theme-orange .card-header{background:var(--orange-bg)}
+.theme-orange .card-icon{background:#f4a261;color:#fff}
+.theme-purple .card-header{background:var(--purple-bg)}
+.theme-purple .card-icon{background:var(--purple);color:#fff}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:560px){.form-row{grid-template-columns:1fr}}
+.field label{display:block;font-size:.82rem;font-weight:600;color:#495057;margin-bottom:6px}
+.field input,.field select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.95rem;color:var(--text);background:#fff;transition:border-color .2s,box-shadow .2s;outline:none}
+.field input:focus,.field select:focus{border-color:var(--green-l);box-shadow:0 0 0 3px rgba(82,183,136,.18)}
+.field .hint{font-size:.74rem;color:#adb5bd;margin-top:4px;line-height:1.4}
+.divider{border:none;border-top:1px dashed var(--border);margin:16px 0}
+.result-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:8px;margin-bottom:8px;background:var(--bg)}
+.result-row .rl{font-size:.88rem;color:var(--gray)}
+.result-row .rv{font-size:1rem;font-weight:700;color:var(--green)}
+.result-row.hl-blue{background:var(--blue-bg)}
+.result-row.hl-blue .rl{color:var(--blue);font-weight:700}
+.result-row.hl-blue .rv{color:var(--blue);font-size:1.3rem}
+.result-row.hl-orange{background:var(--orange-bg)}
+.result-row.hl-orange .rl{color:var(--orange);font-weight:700}
+.result-row.hl-orange .rv{color:var(--orange);font-size:1.3rem}
+.result-row.hl-purple{background:var(--purple-bg)}
+.result-row.hl-purple .rl{color:var(--purple);font-weight:700}
+.result-row.hl-purple .rv{color:var(--purple);font-size:1.3rem}
+.result-row.hl-red{background:var(--red-bg)}
+.result-row.hl-red .rl{color:var(--red);font-weight:700}
+.result-row.hl-red .rv{color:var(--red);font-size:1.1rem}
+.alert{padding:10px 14px;border-radius:8px;font-size:.83rem;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.alert-ok{background:#d1e7dd;color:#0f5132;border-left:3px solid #198754}
+.alert-warn{background:#fff3cd;color:#856404;border-left:3px solid #ffc107}
+.alert-info{background:#d1ecf1;color:#0c5460;border-left:3px solid #17a2b8}
+.alert-danger{background:var(--red-bg);color:#721c24;border-left:3px solid var(--red)}
+.formula-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:.83rem;color:#166534;margin:0 0 14px;font-family:"Courier New",monospace;line-height:1.8;word-break:break-all}
+.coeff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 14px}
+@media(max-width:480px){.coeff-grid{grid-template-columns:1fr 1fr}}
+.coeff-item{background:var(--bg);border-radius:8px;padding:8px 10px;text-align:center;border:2px solid transparent;transition:all .2s}
+.coeff-item.active{border-color:var(--green-l);background:var(--green-bg)}
+.coeff-item .cl{font-size:.72rem;color:var(--gray)}
+.coeff-item .cv{font-size:1.05rem;font-weight:800;color:var(--green);margin-top:2px}
+.rank-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:10px}
+.rank-table th{background:var(--purple-bg);color:var(--purple);padding:9px 12px;text-align:left;font-weight:700}
+.rank-table td{padding:9px 12px;border-bottom:1px solid var(--border)}
+.rank-table tr.my-rank td{background:#fef9c3;font-weight:700}
+.rank-table tr:last-child td{border-bottom:none}
+.total-card{background:linear-gradient(135deg,#1b4332 0%,#2d6a4f 55%,#40916c 100%);border-radius:16px;padding:28px 24px;color:#fff;box-shadow:0 6px 28px rgba(27,67,50,.35)}
+.tc-title{font-size:.95rem;opacity:.8;margin-bottom:6px}
+.tc-amount{font-size:3.2rem;font-weight:900;letter-spacing:-2px;line-height:1}
+.tc-amount .unit{font-size:1.2rem;font-weight:400;margin-left:4px;opacity:.85}
+.tc-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+@media(max-width:480px){.tc-breakdown{grid-template-columns:1fr 1fr}}
+.tc-item{background:rgba(255,255,255,.15);border-radius:10px;padding:12px;text-align:center}
+.tc-item .ti-label{font-size:.72rem;opacity:.75;margin-bottom:4px}
+.tc-item .ti-val{font-size:1.15rem;font-weight:800}
+.progress-wrap{margin-top:16px;background:rgba(255,255,255,.2);border-radius:20px;height:8px;overflow:hidden}
+.progress-bar{height:100%;background:#b7e4c7;border-radius:20px;transition:width .6s ease}
+.tc-msg{margin-top:12px;font-size:.9rem;opacity:.9;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#x1F4B0; BD 收入计算器</h1>
+  <p>【H-线下店蓄水】2026年4月 &middot; 北京 &middot; 实时测算你的月收入</p>
+</header>
+
+<div class="container">
+
+<!-- 基础信息 -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:#6c757d;color:#fff">&#x1F464;</div>
+    <div><h2>基础信息</h2><div class="sub">选择 BD 类型，影响所有计算</div></div>
+  </div>
+  <div class="card-body">
+    <div class="form-row">
+      <div class="field">
+        <label>BD 类型</label>
+        <select id="bdType" onchange="onTypeChange()">
+          <option value="old">老 BD（2026年3月20日前入职）</option>
+          <option value="new">新 BD（2026年3月20日后入职）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>本月实际出勤天数</label>
+        <input type="number" id="attendDays" value="25" min="0" max="31" oninput="calcAll()" />
+        <div class="hint">自然月30天，调休5天，全勤25天</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 第一部分：底薪 -->
+<div class="card theme-blue">
+  <div class="card-header">
+    <div class="card-icon">&#x1F3E0;</div>
+    <div><h2>第一部分 &middot; 底薪测算</h2><div class="sub">目标底薪 4,000 元 / 月，按计薪天数比例发放</div></div>
+  </div>
+  <div class="card-body">
+    <div class="form-row">
+      <div class="field">
+        <label>月累计有效入群新用户数（人）</label>
+        <input type="number" id="monthlyUsers" value="1200" min="0" oninput="calcAll()" />
+        <div class="hint" id="hintMonthly">老BD：月均≥50人/天 + 出勤≥20天 → 全月底薪</div>
+      </div>
+      <div class="field">
+        <label>实际拉群作业天数（扫码≥1次）</label>
+        <input type="number" id="workDays" value="25" min="0" max="31" oninput="calcAll()" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>单日有效入群达标天数</label>
+        <input type="number" id="qualDays" value="22" min="0" max="31" oninput="calcAll()" />
+        <div class="hint" id="hintQual">老BD：单日≥45人计薪；新BD：单日≥25人计薪</div>
+      </div>
+      <div class="field">
+        <label>特殊考勤天数</label>
+        <input type="number" id="specialDays" value="0" min="0" max="10" oninput="calcAll()" />
+        <div class="hint">跨城调动 / 公司统一培训当天</div>
+      </div>
+    </div>
+    <hr class="divider" />
+    <div id="salaryResult"></div>
+  </div>
+</div>
+
+<!-- 第二部分：提成 -->
+<div class="card theme-orange">
+  <div class="card-header">
+    <div class="card-icon">&#x1F4C8;</div>
+    <div><h2>第二部分 &middot; 提成测算</h2><div class="sub">提成 = 首单量 &times; 8元 &times; 人效系数 &times; 圈层系数 &times; 1.2</div></div>
+  </div>
+  <div class="card-body">
+    <div class="formula-box" id="formulaBox">提成 = 月首单量 &times; 8元 &times; 人效奖励系数 &times; 圈层系数 &times; 1.2</div>
+    <div class="form-row">
+      <div class="field">
+        <label>月有效首单量（单）</label>
+        <input type="number" id="firstOrders" value="0" min="0" readonly style="background:#f4f6f8;color:#6c757d;cursor:not-allowed" />
+        <div class="hint">= 月累计入群用户 × 转化率（自动计算）</div>
+      </div>
+      <div class="field">
+        <label>有效首单转化率（%）</label>
+        <input type="number" id="convRate" value="25" min="0" max="100" step="0.1" oninput="calcAll()" />
+        <div class="hint">默认 25%，可手动调整</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>入群圈层（距门店步行距离）</label>
+        <select id="circleType" onchange="calcAll()">
+          <option value="0.6">0 – 500m（系数 0.6）</option>
+          <option value="1.2" selected>500m – 1km（系数 1.2）</option>
+          <option value="1.5">1km – 3km（系数 1.5）</option>
+          <option value="1.0">3km 及以上（系数 1.0）</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:.82rem;font-weight:600;color:#495057;margin-bottom:8px">
+        入群人效奖励系数（自动匹配，日均人效 <span id="avgEffDisplay" style="color:var(--green);font-weight:800">—</span> 人/天）
+      </div>
+      <div class="coeff-grid" id="effCoeffGrid"></div>
+    </div>
+    <hr class="divider" />
+    <div id="commissionResult"></div>
+  </div>
+</div>
+
+<!-- 第三部分：激励赛 -->
+<div class="card theme-purple">
+  <div class="card-header">
+    <div class="card-icon">&#x1F3C6;</div>
+    <div><h2>第三部分 &middot; 激励赛测算</h2><div class="sub">H团队团购券激励赛 &middot; 3月30日—4月23日 &middot; 总奖金池 90,000 元</div></div>
+  </div>
+  <div class="card-body">
+    <div class="alert alert-info">
+      <span>&#x2139;&#xFE0F;</span>
+      <span>参与资格：老BD个人累计售卖团购券 ≥ 100张；排名依据：团购券绝对销量（由高到低）</span>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>个人累计售卖团购券（张）</label>
+        <input type="number" id="couponSales" value="150" min="0" oninput="calcAll()" />
+      </div>
+      <div class="field">
+        <label>预估个人排名（第几名）</label>
+        <input type="number" id="myRank" value="25" min="1" oninput="calcAll()" />
+        <div class="hint">根据销量估算你的排名</div>
+      </div>
+    </div>
+    <table class="rank-table" id="rankTable">
+      <thead><tr><th>排名区间</th><th>个人奖金</th><th>预计总奖金</th></tr></thead>
+      <tbody>
+        <tr data-min="1"  data-max="10"  data-prize="2000"><td>第 1—10 名</td><td>2,000 元</td><td>20,000 元</td></tr>
+        <tr data-min="11" data-max="20"  data-prize="1800"><td>第 11—20 名</td><td>1,800 元</td><td>18,000 元</td></tr>
+        <tr data-min="21" data-max="30"  data-prize="1500"><td>第 21—30 名</td><td>1,500 元</td><td>15,000 元</td></tr>
+        <tr data-min="31" data-max="40"  data-prize="1000"><td>第 31—40 名</td><td>1,000 元</td><td>10,000 元</td></tr>
+        <tr data-min="41" data-max="50"  data-prize="700" ><td>第 41—50 名</td><td>700 元</td><td>7,000 元</td></tr>
+        <tr data-min="51" data-max="60"  data-prize="500" ><td>第 51—60 名</td><td>500 元</td><td>5,000 元</td></tr>
+        <tr data-min="61" data-max="70"  data-prize="350" ><td>第 61—70 名</td><td>350 元</td><td>3,500 元</td></tr>
+      </tbody>
+    </table>
+    <hr class="divider" />
+    <div id="incentiveResult"></div>
+  </div>
+</div>
+
+<!-- 总计 -->
+<div class="total-card">
+  <div class="tc-title">&#x1F3AF; 本月预计总收入（底薪 + 提成 + 激励赛）</div>
+  <div class="tc-amount" id="tcAmount">—<span class="unit">元</span></div>
+  <div class="tc-breakdown">
+    <div class="tc-item"><div class="ti-label">&#x1F3E0; 底薪</div><div class="ti-val" id="tcSalary">—</div></div>
+    <div class="tc-item"><div class="ti-label">&#x1F4C8; 提成</div><div class="ti-val" id="tcCommission">—</div></div>
+    <div class="tc-item"><div class="ti-label">&#x1F3C6; 激励赛</div><div class="ti-val" id="tcIncentive">—</div></div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  <div class="tc-msg" id="tcMsg"></div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+var $ = function(id){ return document.getElementById(id); };
+var numVal = function(id){ return parseFloat($(id).value) || 0; };
+var fmt = function(n){ return Math.round(n).toLocaleString('zh-CN'); };
+var fmtF = function(n, d){ return n.toFixed(d !== undefined ? d : 1); };
+
+function onTypeChange() {
+  var isNew = $('bdType').value === 'new';
+  $('hintMonthly').textContent = isNew
+    ? '新BD：月均≥30人/天 + 出勤≥20天 → 全月底薪'
+    : '老BD：月均≥50人/天 + 出勤≥20天 → 全月底薪';
+  $('hintQual').textContent = isNew
+    ? '新BD：单日≥25人计薪'
+    : '老BD：单日≥45人计薪';
+  calcAll();
+}
+
+function calcSalary() {
+  var isNew       = $('bdType').value === 'new';
+  var monthUsers  = numVal('monthlyUsers');
+  var workDays    = numVal('workDays');
+  var qualDays    = numVal('qualDays');
+  var specialDays = numVal('specialDays');
+  var attendDays  = numVal('attendDays');
+  var BASE = 4000, FULL_DAYS = 25;
+  var minAvg = isNew ? 30 : 50;
+  var avgEff = workDays > 0 ? monthUsers / workDays : 0;
+  var fullOk = avgEff >= minAvg && attendDays >= 20;
+  var payDays = Math.min(qualDays + specialDays, FULL_DAYS);
+  var salary = fullOk ? BASE : Math.round(BASE * payDays / FULL_DAYS);
+  var h = '';
+  if (fullOk) {
+    h += '<div class="alert alert-ok">&#x2705; 满足全月底薪条件（月均人效 ' + fmtF(avgEff) + ' ≥ ' + minAvg + '，出勤 ' + attendDays + ' ≥ 20 天）</div>';
+  } else {
+    var reasons = [];
+    if (avgEff < minAvg)     reasons.push('月均人效 ' + fmtF(avgEff) + ' &lt; ' + minAvg);
+    if (attendDays < 20)     reasons.push('出勤 ' + attendDays + ' &lt; 20 天');
+    h += '<div class="alert alert-warn">&#x26A0;&#xFE0F; 未达全月底薪：' + reasons.join('；') + '</div>';
+  }
+  h += '<div class="result-row"><span class="rl">月均有效入群人效</span><span class="rv">' + fmtF(avgEff) + ' 人/天</span></div>';
+  h += '<div class="result-row"><span class="rl">计薪天数（达标 ' + qualDays + ' + 特殊 ' + specialDays + '）</span><span class="rv">' + payDays + ' 天</span></div>';
+  h += '<div class="result-row hl-blue"><span class="rl">&#x1F4B0; 底薪</span><span class="rv">' + fmt(salary) + ' 元</span></div>';
+  $('salaryResult').innerHTML = h;
+  return salary;
+}
+
+function calcCommission(yellowDeduct) {
+  var isNew       = $('bdType').value === 'new';
+  var monthUsers  = numVal('monthlyUsers');
+  var workDays    = numVal('workDays');
+  var convRate    = numVal('convRate') / 100;
+  var firstOrders = Math.round(monthUsers * convRate);
+  $('firstOrders').value = firstOrders;
+  var circleCoeff = parseFloat($('circleType').value);
+  var RECOGNIZE   = 1.2;
+  var avgEff = workDays > 0 ? monthUsers / workDays : 0;
+  $('avgEffDisplay').textContent = fmtF(avgEff);
+  var tiers = isNew
+    ? [{max:25,c:1.0,label:'&lt; 25'},{max:35,c:1.5,label:'25–35'},{max:Infinity,c:1.8,label:'≥ 35'}]
+    : [{max:45,c:1.0,label:'&lt; 45'},{max:55,c:1.5,label:'45–55'},{max:Infinity,c:1.8,label:'≥ 55'}];
+  var effCoeff = 1.0;
+  for (var i = 0; i < tiers.length; i++) {
+    if (avgEff < tiers[i].max) { effCoeff = tiers[i].c; break; }
+  }
+  $('effCoeffGrid').innerHTML = tiers.map(function(t) {
+    var active = t.c === effCoeff ? ' active' : '';
+    return '<div class="coeff-item' + active + '"><div class="cl">' + t.label + '</div><div class="cv">× ' + t.c + '</div></div>';
+  }).join('');
+  var base = firstOrders * 8 * effCoeff * circleCoeff * RECOGNIZE;
+  var commission = base * (yellowDeduct ? 0.9 : 1);
+  $('formulaBox').textContent = firstOrders + ' × 8 × ' + effCoeff + ' × ' + circleCoeff + ' × ' + RECOGNIZE
+    + (yellowDeduct ? ' × 0.9(黄线扣罚)' : '') + ' = ' + fmt(commission) + ' 元';
+  var h = '';
+  h += '<div class="result-row"><span class="rl">月首单量</span><span class="rv">' + firstOrders + ' 单</span></div>';
+  h += '<div class="result-row"><span class="rl">人效奖励系数</span><span class="rv">' + effCoeff + '</span></div>';
+  h += '<div class="result-row"><span class="rl">圈层系数</span><span class="rv">' + circleCoeff + '</span></div>';
+  h += '<div class="result-row"><span class="rl">可识别占比系数</span><span class="rv">1.2</span></div>';
+  if (yellowDeduct) h += '<div class="result-row hl-red"><span class="rl">&#x26A0;&#xFE0F; 黄线扣罚（-10%）</span><span class="rv">-' + fmt(base * 0.1) + ' 元</span></div>';
+  h += '<div class="result-row hl-orange"><span class="rl">&#x1F4B0; 提成合计</span><span class="rv">' + fmt(commission) + ' 元</span></div>';
+  $('commissionResult').innerHTML = h;
+  return commission;
+}
+
+function calcIncentive() {
+  var couponSales = numVal('couponSales');
+  var myRank      = parseInt($('myRank').value) || 0;
+  var TIERS = [
+    {min:1, max:10, prize:2000},{min:11,max:20,prize:1800},
+    {min:21,max:30,prize:1500},{min:31,max:40,prize:1000},
+    {min:41,max:50,prize:700}, {min:51,max:60,prize:500},
+    {min:61,max:70,prize:350}
+  ];
+  document.querySelectorAll('#rankTable tbody tr').forEach(function(tr) {
+    tr.classList.remove('my-rank');
+    if (couponSales >= 100 && myRank >= parseInt(tr.dataset.min) && myRank <= parseInt(tr.dataset.max))
+      tr.classList.add('my-rank');
+  });
+  var prize = 0, tierLabel = '未入围（排名超出70名）';
+  if (couponSales < 100) {
+    tierLabel = '未达参赛门槛（需累计售卖 ≥ 100 张）';
+  } else {
+    for (var i = 0; i < TIERS.length; i++) {
+      if (myRank >= TIERS[i].min && myRank <= TIERS[i].max) {
+        prize = TIERS[i].prize;
+        tierLabel = '第 ' + TIERS[i].min + '–' + TIERS[i].max + ' 名，奖金 ' + fmt(prize) + ' 元';
+        break;
+      }
+    }
+  }
+  var h = couponSales < 100
+    ? '<div class="alert alert-warn">&#x26A0;&#xFE0F; 累计售卖 ' + couponSales + ' 张，未达 100 张参赛门槛</div>'
+    : '<div class="alert alert-ok">&#x2705; 已达参赛门槛（累计售卖 ' + couponSales + ' 张）</div>';
+  h += '<div class="result-row"><span class="rl">团购券累计售卖</span><span class="rv">' + couponSales + ' 张</span></div>';
+  h += '<div class="result-row"><span class="rl">预估排名</span><span class="rv">第 ' + myRank + ' 名</span></div>';
+  h += '<div class="result-row"><span class="rl">所在梯度</span><span class="rv">' + tierLabel + '</span></div>';
+  h += '<div class="result-row hl-purple"><span class="rl">&#x1F4B0; 激励赛奖金</span><span class="rv">' + fmt(prize) + ' 元</span></div>';
+  $('incentiveResult').innerHTML = h;
+  return prize;
+}
+
+function calcAll() {
+  var salary     = calcSalary();
+  var commission = calcCommission(false);
+  var incentive  = calcIncentive();
+  var total      = salary + commission + incentive;
+  $('tcAmount').innerHTML = fmt(total) + '<span class="unit">元</span>';
+  $('tcSalary').textContent     = fmt(salary)     + ' 元';
+  $('tcCommission').textContent = fmt(commission)  + ' 元';
+  $('tcIncentive').textContent  = fmt(incentive)   + ' 元';
+  $('progressBar').style.width  = Math.min(100, Math.round(total / 15000 * 100)) + '%';
+  var msg = total >= 15000 ? '&#x1F525; 超神！你就是团队的传说！'
+          : total >= 10000 ? '&#x1F4AA; 干得漂亮，继续冲！'
+          : total >= 6000  ? '&#x1F44D; 不错，还有提升空间！'
+          : '&#x1F4A1; 加油，好好搞钱！';
+  $('tcMsg').innerHTML = msg;
+}
+
+window.addEventListener('DOMContentLoaded', calcAll);
+</script>
+</body>
+</html>
