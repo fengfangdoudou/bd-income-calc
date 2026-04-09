@@ -1,393 +1,1132 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BD 收入计算器 · 2026年4月</title>
-<style>
-:root {
-  --green:#2d6a4f; --green-l:#52b788; --green-bg:#d8f3dc;
-  --blue:#1a73e8;  --blue-bg:#e8f4fd;
-  --orange:#e65100; --orange-bg:#fff3e0;
-  --purple:#5b21b6; --purple-bg:#f3e8ff;
-  --red:#e63946;   --red-bg:#fde8e8;
-  --gray:#6c757d;  --bg:#f4f6f8; --card:#fff;
-  --border:#dee2e6; --text:#212529;
-  --shadow:0 2px 16px rgba(0,0,0,.07);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-header{background:linear-gradient(135deg,#1b4332 0%,#2d6a4f 55%,#40916c 100%);color:#fff;padding:36px 24px 28px;text-align:center}
-header h1{font-size:1.75rem;font-weight:900;letter-spacing:.5px}
-header p{margin-top:8px;font-size:.9rem;opacity:.8}
-.container{max-width:900px;margin:0 auto;padding:24px 16px 80px;display:flex;flex-direction:column;gap:20px}
-.card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
-.card-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border)}
-.card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
-.card-header h2{font-size:1.05rem;font-weight:700}
-.card-header .sub{font-size:.78rem;color:var(--gray);margin-top:2px}
-.card-body{padding:20px}
-.theme-blue .card-header{background:var(--blue-bg)}
-.theme-blue .card-icon{background:var(--blue);color:#fff}
-.theme-orange .card-header{background:var(--orange-bg)}
-.theme-orange .card-icon{background:#f4a261;color:#fff}
-.theme-purple .card-header{background:var(--purple-bg)}
-.theme-purple .card-icon{background:var(--purple);color:#fff}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-@media(max-width:560px){.form-row{grid-template-columns:1fr}}
-.field label{display:block;font-size:.82rem;font-weight:600;color:#495057;margin-bottom:6px}
-.field input,.field select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.95rem;color:var(--text);background:#fff;transition:border-color .2s,box-shadow .2s;outline:none}
-.field input:focus,.field select:focus{border-color:var(--green-l);box-shadow:0 0 0 3px rgba(82,183,136,.18)}
-.field .hint{font-size:.74rem;color:#adb5bd;margin-top:4px;line-height:1.4}
-.divider{border:none;border-top:1px dashed var(--border);margin:16px 0}
-.result-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:8px;margin-bottom:8px;background:var(--bg)}
-.result-row .rl{font-size:.88rem;color:var(--gray)}
-.result-row .rv{font-size:1rem;font-weight:700;color:var(--green)}
-.result-row.hl-blue{background:var(--blue-bg)}
-.result-row.hl-blue .rl{color:var(--blue);font-weight:700}
-.result-row.hl-blue .rv{color:var(--blue);font-size:1.3rem}
-.result-row.hl-orange{background:var(--orange-bg)}
-.result-row.hl-orange .rl{color:var(--orange);font-weight:700}
-.result-row.hl-orange .rv{color:var(--orange);font-size:1.3rem}
-.result-row.hl-purple{background:var(--purple-bg)}
-.result-row.hl-purple .rl{color:var(--purple);font-weight:700}
-.result-row.hl-purple .rv{color:var(--purple);font-size:1.3rem}
-.result-row.hl-red{background:var(--red-bg)}
-.result-row.hl-red .rl{color:var(--red);font-weight:700}
-.result-row.hl-red .rv{color:var(--red);font-size:1.1rem}
-.alert{padding:10px 14px;border-radius:8px;font-size:.83rem;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
-.alert-ok{background:#d1e7dd;color:#0f5132;border-left:3px solid #198754}
-.alert-warn{background:#fff3cd;color:#856404;border-left:3px solid #ffc107}
-.alert-info{background:#d1ecf1;color:#0c5460;border-left:3px solid #17a2b8}
-.alert-danger{background:var(--red-bg);color:#721c24;border-left:3px solid var(--red)}
-.formula-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:.83rem;color:#166534;margin:0 0 14px;font-family:"Courier New",monospace;line-height:1.8;word-break:break-all}
-.coeff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 14px}
-@media(max-width:480px){.coeff-grid{grid-template-columns:1fr 1fr}}
-.coeff-item{background:var(--bg);border-radius:8px;padding:8px 10px;text-align:center;border:2px solid transparent;transition:all .2s}
-.coeff-item.active{border-color:var(--green-l);background:var(--green-bg)}
-.coeff-item .cl{font-size:.72rem;color:var(--gray)}
-.coeff-item .cv{font-size:1.05rem;font-weight:800;color:var(--green);margin-top:2px}
-.rank-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:10px}
-.rank-table th{background:var(--purple-bg);color:var(--purple);padding:9px 12px;text-align:left;font-weight:700}
-.rank-table td{padding:9px 12px;border-bottom:1px solid var(--border)}
-.rank-table tr.my-rank td{background:#fef9c3;font-weight:700}
-.rank-table tr:last-child td{border-bottom:none}
-.total-card{background:linear-gradient(135deg,#1b4332 0%,#2d6a4f 55%,#40916c 100%);border-radius:16px;padding:28px 24px;color:#fff;box-shadow:0 6px 28px rgba(27,67,50,.35)}
-.tc-title{font-size:.95rem;opacity:.8;margin-bottom:6px}
-.tc-amount{font-size:3.2rem;font-weight:900;letter-spacing:-2px;line-height:1}
-.tc-amount .unit{font-size:1.2rem;font-weight:400;margin-left:4px;opacity:.85}
-.tc-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
-@media(max-width:480px){.tc-breakdown{grid-template-columns:1fr 1fr}}
-.tc-item{background:rgba(255,255,255,.15);border-radius:10px;padding:12px;text-align:center}
-.tc-item .ti-label{font-size:.72rem;opacity:.75;margin-bottom:4px}
-.tc-item .ti-val{font-size:1.15rem;font-weight:800}
-.progress-wrap{margin-top:16px;background:rgba(255,255,255,.2);border-radius:20px;height:8px;overflow:hidden}
-.progress-bar{height:100%;background:#b7e4c7;border-radius:20px;transition:width .6s ease}
-.tc-msg{margin-top:12px;font-size:.9rem;opacity:.9;text-align:center}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>赠品分配数量计算器</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #FAF7F2;
+      min-height: 100vh;
+      padding: 28px 14px 60px;
+      color: #2d2d2d;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; }
+
+    h1 {
+      text-align: center;
+      font-size: 21px;
+      font-weight: 700;
+      color: #4A6741;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 14px rgba(74,103,65,.09);
+      padding: 20px 22px;
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #4A6741;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .card-title::before {
+      content: "";
+      display: inline-block;
+      width: 4px; height: 16px;
+      background: #4A6741;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .step-arrow {
+      text-align: center;
+      font-size: 22px;
+      color: #B5D4A8;
+      margin: -6px 0 10px;
+      line-height: 1;
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #4A6741;
+      color: #fff;
+      font-size: 11px; font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    input[type="number"], input[type="text"] {
+      border: 1.5px solid #D6E8C4;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 14px;
+      color: #2d2d2d;
+      background: #FAFFF8;
+      outline: none;
+      transition: border-color .18s;
+      width: 100%;
+    }
+    input:focus { border-color: #4A6741; background: #fff; }
+    input[readonly] { background: #f5f5f5; color: #888; cursor: not-allowed; }
+
+    .col-label { font-size: 11px; color: #999; text-align: center; }
+    .col-label:first-child { text-align: left; }
+
+    /* ── 到货行：名称 | 到货数量 | 箱规 | 占比 | 删除 ── */
+    .arrival-header,
+    .arrival-row {
+      display: grid;
+      grid-template-columns: 1.8fr 110px 90px 90px 36px;
+      gap: 8px;
+      align-items: center;
+    }
+    @media (max-width: 580px) {
+      .arrival-header,
+      .arrival-row { grid-template-columns: 1fr 80px 68px 68px 28px; gap: 5px; }
+    }
+
+    .arrival-list { display: flex; flex-direction: column; gap: 9px; }
+
+    .pct-display {
+      background: #EDF5D6;
+      border-radius: 8px;
+      padding: 8px 6px;
+      font-size: 13px; font-weight: 700; color: #3D5A3E;
+      text-align: center; min-height: 38px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pct-display.dim { background: #f5f5f5; color: #bbb; font-weight: 400; }
+
+    .arrival-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #F0F7EB;
+      border-radius: 10px;
+      padding: 11px 16px;
+      margin-top: 14px;
+      border: 1px solid #D6E8C4;
+    }
+    .arrival-banner .ab-label { font-size: 12px; color: #4A6741; font-weight: 600; }
+    .arrival-banner .ab-value { font-size: 20px; font-weight: 800; color: #3D5A3E; }
+    .arrival-banner .ab-unit  { font-size: 12px; color: #7a9a72; margin-left: 3px; }
+
+    /* ── BDM 输入行：姓名 | 目标 | 差异量 | 净目标 | 删除 ── */
+    .bdm-input-header,
+    .bdm-input-row {
+      display: grid;
+      grid-template-columns: 1.6fr 100px 100px 100px 36px;
+      gap: 8px;
+      align-items: center;
+    }
+    @media (max-width: 580px) {
+      .bdm-input-header,
+      .bdm-input-row { grid-template-columns: 1fr 76px 76px 76px 28px; gap: 5px; }
+    }
+
+    .bdm-input-list { display: flex; flex-direction: column; gap: 9px; }
+
+    .net-display {
+      background: linear-gradient(135deg, #4A6741, #6a9460);
+      border-radius: 8px;
+      padding: 8px 6px;
+      font-size: 13px; font-weight: 700; color: #fff;
+      text-align: center; min-height: 38px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .net-display.dim { background: #f5f5f5; color: #bbb; font-weight: 400; }
+
+    /* ── 分配结果区 ── */
+    .bdm-result-block {
+      margin-top: 20px;
+      border-top: 1.5px dashed #D6E8C4;
+      padding-top: 16px;
+    }
+
+    .bdm-result-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #4A6741;
+      margin-bottom: 10px;
+    }
+
+    /* BDM 分配结果表：赠品名 | 占比 | 件数 | 箱规 | 箱数 */
+    .alloc-header,
+    .alloc-row {
+      display: grid;
+      grid-template-columns: 1.8fr 72px 96px 72px 96px;
+      gap: 8px;
+      align-items: center;
+    }
+    @media (max-width: 580px) {
+      .alloc-header,
+      .alloc-row { grid-template-columns: 1fr 58px 76px 58px 76px; gap: 5px; }
+    }
+
+    .alloc-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .result-pcs {
+      background: #EDF5D6;
+      border-radius: 8px;
+      padding: 7px 6px;
+      font-size: 13px; font-weight: 700; color: #3D5A3E;
+      text-align: center; min-height: 34px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .result-box-val {
+      background: #FFF8E8;
+      border-radius: 8px;
+      padding: 7px 6px;
+      font-size: 13px; font-weight: 700; color: #7A5C1E;
+      text-align: center; min-height: 34px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .result-dim {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 7px 6px;
+      font-size: 13px; color: #bbb;
+      text-align: center; min-height: 34px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* BDM 卡片（每个 BDM 一块） */
+    .bdm-card {
+      background: #F7FBF2;
+      border: 1px solid #D6E8C4;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .bdm-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .bdm-card-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #3D5A3E;
+    }
+    .bdm-card-net {
+      font-size: 12px;
+      color: #7a9a72;
+      background: #D6E8C4;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-weight: 600;
+    }
+
+    .btn-remove {
+      background: none;
+      border: 1.5px solid #e0c8c8;
+      border-radius: 8px;
+      color: #c0756a;
+      font-size: 16px;
+      cursor: pointer;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+      flex-shrink: 0;
+    }
+    .btn-remove:hover { background: #fdf0ee; }
+
+    .btn-add {
+      margin-top: 11px;
+      width: 100%;
+      padding: 9px;
+      border: 2px dashed #B5D4A8;
+      border-radius: 10px;
+      background: none;
+      color: #4A6741;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .btn-add:hover { background: #EDF5D6; border-color: #4A6741; }
+
+    .hint { font-size: 11px; color: #bbb; text-align: center; margin-top: 10px; }
+
+    .empty-tip {
+      text-align: center; color: #bbb; font-size: 13px; padding: 18px 0;
+    }
+
+    .alloc-name-cell {
+      font-size: 13px; font-weight: 500;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .alloc-pct-cell  { font-size: 12px; color: #7A5C1E; font-weight: 600; text-align: center; }
+    .alloc-spec-cell { font-size: 12px; color: #999; text-align: center; }
+  </style>
 </head>
 <body>
-
-<header>
-  <h1>&#x1F4B0; BD 收入计算器</h1>
-  <p>【H-线下店蓄水】2026年4月 &middot; 北京 &middot; 实时测算你的月收入</p>
-</header>
-
 <div class="container">
+  <h1>🎁 赠品分配数量计算器</h1>
+  <p class="subtitle">先录入总到货，再按各 BDM 目标自动分配</p>
 
-<!-- 基础信息 -->
-<div class="card">
-  <div class="card-header">
-    <div class="card-icon" style="background:#6c757d;color:#fff">&#x1F464;</div>
-    <div><h2>基础信息</h2><div class="sub">选择 BD 类型，影响所有计算</div></div>
+  <!-- ══ STEP 1：总到货 ══ -->
+  <div class="card">
+    <div class="card-title">
+      <span class="step-badge">1</span>
+      总到货登记
+    </div>
+
+    <div class="arrival-header" style="margin-bottom:6px;">
+      <span class="col-label">赠品名称</span>
+      <span class="col-label">到货数量（件）</span>
+      <span class="col-label">箱规（件/箱）</span>
+      <span class="col-label">占总到货比例</span>
+      <span></span>
+    </div>
+    <div class="arrival-list" id="arrivalList"></div>
+    <button class="btn-add" id="btnAddArrival">＋ 添加赠品</button>
+
+    <div class="arrival-banner">
+      <span class="ab-label">总到货数量</span>
+      <div>
+        <span class="ab-value" id="totalArrival">—</span>
+        <span class="ab-unit">件</span>
+      </div>
+    </div>
   </div>
-  <div class="card-body">
-    <div class="form-row">
-      <div class="field">
-        <label>BD 类型</label>
-        <select id="bdType" onchange="onTypeChange()">
-          <option value="old">老 BD（2026年3月20日前入职）</option>
-          <option value="new">新 BD（2026年3月20日后入职）</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>本月实际出勤天数</label>
-        <input type="number" id="attendDays" value="25" min="0" max="31" oninput="calcAll()" />
-        <div class="hint">自然月30天，调休5天，全勤25天</div>
-      </div>
+
+  <div class="step-arrow">↓</div>
+
+  <!-- ══ STEP 2：BDM 分配 ══ -->
+  <div class="card">
+    <div class="card-title">
+      <span class="step-badge">2</span>
+      BDM 赠品测算
+    </div>
+
+    <!-- BDM 输入列表 -->
+    <div class="bdm-input-header" style="margin-bottom:6px;">
+      <span class="col-label">BDM 姓名</span>
+      <span class="col-label">目标</span>
+      <span class="col-label">差异量</span>
+      <span class="col-label">净目标</span>
+      <span></span>
+    </div>
+    <div class="bdm-input-list" id="bdmInputList"></div>
+    <button class="btn-add" id="btnAddBdm">＋ 添加其他 BDM</button>
+
+    <!-- 分配结果 -->
+    <div class="bdm-result-block" id="bdmResultBlock" style="display:none;">
+      <div class="bdm-result-title">各 BDM 赠品分配明细</div>
+      <div id="bdmResultCards"></div>
+      <p class="hint">件数 = ⌊净目标 × 到货占比⌋；箱数 = ⌊件数 ÷ 箱规⌋</p>
+    </div>
+
+    <div class="empty-tip" id="bdmEmpty">
+      请先完成第①步录入到货数据，并填写 BDM 信息
     </div>
   </div>
 </div>
-
-<!-- 第一部分：底薪 -->
-<div class="card theme-blue">
-  <div class="card-header">
-    <div class="card-icon">&#x1F3E0;</div>
-    <div><h2>第一部分 &middot; 底薪测算</h2><div class="sub">目标底薪 4,000 元 / 月，按计薪天数比例发放</div></div>
-  </div>
-  <div class="card-body">
-    <div class="form-row">
-      <div class="field">
-        <label>月累计有效入群新用户数（人）</label>
-        <input type="number" id="monthlyUsers" value="1200" min="0" oninput="calcAll()" />
-        <div class="hint" id="hintMonthly">老BD：月均≥50人/天 + 出勤≥20天 → 全月底薪</div>
-      </div>
-      <div class="field">
-        <label>实际拉群作业天数（扫码≥1次）</label>
-        <input type="number" id="workDays" value="25" min="0" max="31" oninput="calcAll()" />
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="field">
-        <label>单日有效入群达标天数</label>
-        <input type="number" id="qualDays" value="22" min="0" max="31" oninput="calcAll()" />
-        <div class="hint" id="hintQual">老BD：单日≥45人计薪；新BD：单日≥25人计薪</div>
-      </div>
-      <div class="field">
-        <label>特殊考勤天数</label>
-        <input type="number" id="specialDays" value="0" min="0" max="10" oninput="calcAll()" />
-        <div class="hint">跨城调动 / 公司统一培训当天</div>
-      </div>
-    </div>
-    <hr class="divider" />
-    <div id="salaryResult"></div>
-  </div>
-</div>
-
-<!-- 第二部分：提成 -->
-<div class="card theme-orange">
-  <div class="card-header">
-    <div class="card-icon">&#x1F4C8;</div>
-    <div><h2>第二部分 &middot; 提成测算</h2><div class="sub">提成 = 首单量 &times; 8元 &times; 人效系数 &times; 圈层系数 &times; 1.2</div></div>
-  </div>
-  <div class="card-body">
-    <div class="formula-box" id="formulaBox">提成 = 月首单量 &times; 8元 &times; 人效奖励系数 &times; 圈层系数 &times; 1.2</div>
-    <div class="form-row">
-      <div class="field">
-        <label>月有效首单量（单）</label>
-        <input type="number" id="firstOrders" value="0" min="0" readonly style="background:#f4f6f8;color:#6c757d;cursor:not-allowed" />
-        <div class="hint">= 月累计入群用户 × 转化率（自动计算）</div>
-      </div>
-      <div class="field">
-        <label>有效首单转化率（%）</label>
-        <input type="number" id="convRate" value="25" min="0" max="100" step="0.1" oninput="calcAll()" />
-        <div class="hint">默认 25%，可手动调整</div>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="field">
-        <label>入群圈层（距门店步行距离）</label>
-        <select id="circleType" onchange="calcAll()">
-          <option value="0.6">0 – 500m（系数 0.6）</option>
-          <option value="1.2" selected>500m – 1km（系数 1.2）</option>
-          <option value="1.5">1km – 3km（系数 1.5）</option>
-          <option value="1.0">3km 及以上（系数 1.0）</option>
-        </select>
-      </div>
-    </div>
-    <div style="margin-bottom:14px">
-      <div style="font-size:.82rem;font-weight:600;color:#495057;margin-bottom:8px">
-        入群人效奖励系数（自动匹配，日均人效 <span id="avgEffDisplay" style="color:var(--green);font-weight:800">—</span> 人/天）
-      </div>
-      <div class="coeff-grid" id="effCoeffGrid"></div>
-    </div>
-    <hr class="divider" />
-    <div id="commissionResult"></div>
-  </div>
-</div>
-
-<!-- 第三部分：激励赛 -->
-<div class="card theme-purple">
-  <div class="card-header">
-    <div class="card-icon">&#x1F3C6;</div>
-    <div><h2>第三部分 &middot; 激励赛测算</h2><div class="sub">H团队团购券激励赛 &middot; 3月30日—4月23日 &middot; 总奖金池 90,000 元</div></div>
-  </div>
-  <div class="card-body">
-    <div class="alert alert-info">
-      <span>&#x2139;&#xFE0F;</span>
-      <span>参与资格：老BD个人累计售卖团购券 ≥ 100张；排名依据：团购券绝对销量（由高到低）</span>
-    </div>
-    <div class="form-row">
-      <div class="field">
-        <label>个人累计售卖团购券（张）</label>
-        <input type="number" id="couponSales" value="150" min="0" oninput="calcAll()" />
-      </div>
-      <div class="field">
-        <label>预估个人排名（第几名）</label>
-        <input type="number" id="myRank" value="25" min="1" oninput="calcAll()" />
-        <div class="hint">根据销量估算你的排名</div>
-      </div>
-    </div>
-    <table class="rank-table" id="rankTable">
-      <thead><tr><th>排名区间</th><th>个人奖金</th><th>预计总奖金</th></tr></thead>
-      <tbody>
-        <tr data-min="1"  data-max="10"  data-prize="2000"><td>第 1—10 名</td><td>2,000 元</td><td>20,000 元</td></tr>
-        <tr data-min="11" data-max="20"  data-prize="1800"><td>第 11—20 名</td><td>1,800 元</td><td>18,000 元</td></tr>
-        <tr data-min="21" data-max="30"  data-prize="1500"><td>第 21—30 名</td><td>1,500 元</td><td>15,000 元</td></tr>
-        <tr data-min="31" data-max="40"  data-prize="1000"><td>第 31—40 名</td><td>1,000 元</td><td>10,000 元</td></tr>
-        <tr data-min="41" data-max="50"  data-prize="700" ><td>第 41—50 名</td><td>700 元</td><td>7,000 元</td></tr>
-        <tr data-min="51" data-max="60"  data-prize="500" ><td>第 51—60 名</td><td>500 元</td><td>5,000 元</td></tr>
-        <tr data-min="61" data-max="70"  data-prize="350" ><td>第 61—70 名</td><td>350 元</td><td>3,500 元</td></tr>
-      </tbody>
-    </table>
-    <hr class="divider" />
-    <div id="incentiveResult"></div>
-  </div>
-</div>
-
-<!-- 总计 -->
-<div class="total-card">
-  <div class="tc-title">&#x1F3AF; 本月预计总收入（底薪 + 提成 + 激励赛）</div>
-  <div class="tc-amount" id="tcAmount">—<span class="unit">元</span></div>
-  <div class="tc-breakdown">
-    <div class="tc-item"><div class="ti-label">&#x1F3E0; 底薪</div><div class="ti-val" id="tcSalary">—</div></div>
-    <div class="tc-item"><div class="ti-label">&#x1F4C8; 提成</div><div class="ti-val" id="tcCommission">—</div></div>
-    <div class="tc-item"><div class="ti-label">&#x1F3C6; 激励赛</div><div class="ti-val" id="tcIncentive">—</div></div>
-  </div>
-  <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
-  <div class="tc-msg" id="tcMsg"></div>
-</div>
-
-</div><!-- /container -->
 
 <script>
-var $ = function(id){ return document.getElementById(id); };
-var numVal = function(id){ return parseFloat($(id).value) || 0; };
-var fmt = function(n){ return Math.round(n).toLocaleString('zh-CN'); };
-var fmtF = function(n, d){ return n.toFixed(d !== undefined ? d : 1); };
-
-function onTypeChange() {
-  var isNew = $('bdType').value === 'new';
-  $('hintMonthly').textContent = isNew
-    ? '新BD：月均≥30人/天 + 出勤≥20天 → 全月底薪'
-    : '老BD：月均≥50人/天 + 出勤≥20天 → 全月底薪';
-  $('hintQual').textContent = isNew
-    ? '新BD：单日≥25人计薪'
-    : '老BD：单日≥45人计薪';
-  calcAll();
-}
-
-function calcSalary() {
-  var isNew       = $('bdType').value === 'new';
-  var monthUsers  = numVal('monthlyUsers');
-  var workDays    = numVal('workDays');
-  var qualDays    = numVal('qualDays');
-  var specialDays = numVal('specialDays');
-  var attendDays  = numVal('attendDays');
-  var BASE = 4000, FULL_DAYS = 25;
-  var minAvg = isNew ? 30 : 50;
-  var avgEff = workDays > 0 ? monthUsers / workDays : 0;
-  var fullOk = avgEff >= minAvg && attendDays >= 20;
-  var payDays = Math.min(qualDays + specialDays, FULL_DAYS);
-  var salary = fullOk ? BASE : Math.round(BASE * payDays / FULL_DAYS);
-  var h = '';
-  if (fullOk) {
-    h += '<div class="alert alert-ok">&#x2705; 满足全月底薪条件（月均人效 ' + fmtF(avgEff) + ' ≥ ' + minAvg + '，出勤 ' + attendDays + ' ≥ 20 天）</div>';
-  } else {
-    var reasons = [];
-    if (avgEff < minAvg)     reasons.push('月均人效 ' + fmtF(avgEff) + ' &lt; ' + minAvg);
-    if (attendDays < 20)     reasons.push('出勤 ' + attendDays + ' &lt; 20 天');
-    h += '<div class="alert alert-warn">&#x26A0;&#xFE0F; 未达全月底薪：' + reasons.join('；') + '</div>';
-  }
-  h += '<div class="result-row"><span class="rl">月均有效入群人效</span><span class="rv">' + fmtF(avgEff) + ' 人/天</span></div>';
-  h += '<div class="result-row"><span class="rl">计薪天数（达标 ' + qualDays + ' + 特殊 ' + specialDays + '）</span><span class="rv">' + payDays + ' 天</span></div>';
-  h += '<div class="result-row hl-blue"><span class="rl">&#x1F4B0; 底薪</span><span class="rv">' + fmt(salary) + ' 元</span></div>';
-  $('salaryResult').innerHTML = h;
-  return salary;
-}
-
-function calcCommission(yellowDeduct) {
-  var isNew       = $('bdType').value === 'new';
-  var monthUsers  = numVal('monthlyUsers');
-  var workDays    = numVal('workDays');
-  var convRate    = numVal('convRate') / 100;
-  var firstOrders = Math.round(monthUsers * convRate);
-  $('firstOrders').value = firstOrders;
-  var circleCoeff = parseFloat($('circleType').value);
-  var RECOGNIZE   = 1.2;
-  var avgEff = workDays > 0 ? monthUsers / workDays : 0;
-  $('avgEffDisplay').textContent = fmtF(avgEff);
-  var tiers = isNew
-    ? [{max:25,c:1.0,label:'&lt; 25'},{max:35,c:1.5,label:'25–35'},{max:Infinity,c:1.8,label:'≥ 35'}]
-    : [{max:45,c:1.0,label:'&lt; 45'},{max:55,c:1.5,label:'45–55'},{max:Infinity,c:1.8,label:'≥ 55'}];
-  var effCoeff = 1.0;
-  for (var i = 0; i < tiers.length; i++) {
-    if (avgEff < tiers[i].max) { effCoeff = tiers[i].c; break; }
-  }
-  $('effCoeffGrid').innerHTML = tiers.map(function(t) {
-    var active = t.c === effCoeff ? ' active' : '';
-    return '<div class="coeff-item' + active + '"><div class="cl">' + t.label + '</div><div class="cv">× ' + t.c + '</div></div>';
-  }).join('');
-  var base = firstOrders * 8 * effCoeff * circleCoeff * RECOGNIZE;
-  var commission = base * (yellowDeduct ? 0.9 : 1);
-  $('formulaBox').textContent = firstOrders + ' × 8 × ' + effCoeff + ' × ' + circleCoeff + ' × ' + RECOGNIZE
-    + (yellowDeduct ? ' × 0.9(黄线扣罚)' : '') + ' = ' + fmt(commission) + ' 元';
-  var h = '';
-  h += '<div class="result-row"><span class="rl">月首单量</span><span class="rv">' + firstOrders + ' 单</span></div>';
-  h += '<div class="result-row"><span class="rl">人效奖励系数</span><span class="rv">' + effCoeff + '</span></div>';
-  h += '<div class="result-row"><span class="rl">圈层系数</span><span class="rv">' + circleCoeff + '</span></div>';
-  h += '<div class="result-row"><span class="rl">可识别占比系数</span><span class="rv">1.2</span></div>';
-  if (yellowDeduct) h += '<div class="result-row hl-red"><span class="rl">&#x26A0;&#xFE0F; 黄线扣罚（-10%）</span><span class="rv">-' + fmt(base * 0.1) + ' 元</span></div>';
-  h += '<div class="result-row hl-orange"><span class="rl">&#x1F4B0; 提成合计</span><span class="rv">' + fmt(commission) + ' 元</span></div>';
-  $('commissionResult').innerHTML = h;
-  return commission;
-}
-
-function calcIncentive() {
-  var couponSales = numVal('couponSales');
-  var myRank      = parseInt($('myRank').value) || 0;
-  var TIERS = [
-    {min:1, max:10, prize:2000},{min:11,max:20,prize:1800},
-    {min:21,max:30,prize:1500},{min:31,max:40,prize:1000},
-    {min:41,max:50,prize:700}, {min:51,max:60,prize:500},
-    {min:61,max:70,prize:350}
+  /* ════════════════════════════════
+     数据
+  ════════════════════════════════ */
+  let arrivals = [
+    { name: "", qty: "", spec: "" },
+    { name: "", qty: "", spec: "" },
   ];
-  document.querySelectorAll('#rankTable tbody tr').forEach(function(tr) {
-    tr.classList.remove('my-rank');
-    if (couponSales >= 100 && myRank >= parseInt(tr.dataset.min) && myRank <= parseInt(tr.dataset.max))
-      tr.classList.add('my-rank');
+
+  const FIXED_BDMS = ["姬羽茜","陈启韵","张义强","段兆烜","刘麒麟","秦亚辉","桑亚东","李锦辉","熊小忠"];
+
+  let bdms = FIXED_BDMS.map(name => ({ name, target: "", diff: "", fixed: true }));
+
+  /* ════════════════════════════════
+     工具
+  ════════════════════════════════ */
+  function totalArrivalQty() {
+    return arrivals.reduce((s, a) => {
+      const v = parseFloat(a.qty);
+      return s + (isNaN(v) ? 0 : v);
+    }, 0);
+  }
+
+  function getBdmNet(b) {
+    const t = parseFloat(b.target);
+    const d = parseFloat(b.diff);
+    if (isNaN(t) || isNaN(d)) return null;
+    return t - d;
+  }
+
+  /* ════════════════════════════════
+     到货列表（增删时重建，输入时只刷新计算）
+  ════════════════════════════════ */
+  function initArrivalRow(i) {
+    const row = document.createElement("div");
+    row.className = "arrival-row";
+
+    const nameEl = document.createElement("input");
+    nameEl.type = "text"; nameEl.placeholder = "赠品名称"; nameEl.value = arrivals[i].name;
+    nameEl.addEventListener("input", e => { arrivals[i].name = e.target.value; refreshCalc(); });
+
+    const qtyEl = document.createElement("input");
+    qtyEl.type = "number"; qtyEl.placeholder = "如：600"; qtyEl.min = "0"; qtyEl.value = arrivals[i].qty;
+    qtyEl.addEventListener("input", e => { arrivals[i].qty = e.target.value; refreshCalc(); });
+
+    const specEl = document.createElement("input");
+    specEl.type = "number"; specEl.placeholder = "如：6"; specEl.min = "1"; specEl.value = arrivals[i].spec;
+    specEl.addEventListener("input", e => { arrivals[i].spec = e.target.value; refreshCalc(); });
+
+    const pctEl = document.createElement("div");
+    pctEl.className = "pct-display dim"; pctEl.textContent = "—";
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn-remove"; delBtn.innerHTML = "×";
+    delBtn.addEventListener("click", () => { arrivals.splice(i, 1); rebuildArrivalList(); refreshCalc(); });
+
+    row.appendChild(nameEl); row.appendChild(qtyEl); row.appendChild(specEl);
+    row.appendChild(pctEl); row.appendChild(delBtn);
+    return row;
+  }
+
+  function rebuildArrivalList() {
+    const list = document.getElementById("arrivalList");
+    list.innerHTML = "";
+    arrivals.forEach((_, i) => list.appendChild(initArrivalRow(i)));
+  }
+
+  /* ════════════════════════════════
+     BDM 输入列表（增删时重建，输入时只刷新计算）
+  ════════════════════════════════ */
+  function initBdmInputRow(i) {
+    const row = document.createElement("div");
+    row.className = "bdm-input-row";
+
+    if (bdms[i].fixed) {
+      // 固定行：姓名只读展示
+      const nameEl = document.createElement("div");
+      nameEl.className = "sp-name-fixed";
+      nameEl.textContent = bdms[i].name;
+      row.appendChild(nameEl);
+    } else {
+      // 额外行：姓名可输入
+      const nameEl = document.createElement("input");
+      nameEl.type = "text"; nameEl.placeholder = "姓名"; nameEl.value = bdms[i].name;
+      nameEl.addEventListener("input", e => { bdms[i].name = e.target.value; refreshCalc(); });
+      row.appendChild(nameEl);
+    }
+
+    const targetEl = document.createElement("input");
+    targetEl.type = "number"; targetEl.placeholder = "目标"; targetEl.min = "0"; targetEl.value = bdms[i].target;
+    targetEl.addEventListener("input", e => { bdms[i].target = e.target.value; refreshCalc(); });
+
+    const diffEl = document.createElement("input");
+    diffEl.type = "number"; diffEl.placeholder = "差异量"; diffEl.value = bdms[i].diff;
+    diffEl.addEventListener("input", e => { bdms[i].diff = e.target.value; refreshCalc(); });
+
+    const netEl = document.createElement("div");
+    netEl.className = "net-display dim"; netEl.textContent = "—";
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn-remove"; delBtn.innerHTML = "×";
+    if (bdms[i].fixed) {
+      delBtn.style.visibility = "hidden"; // 固定行不可删除
+    } else {
+      delBtn.addEventListener("click", () => { bdms.splice(i, 1); rebuildBdmInputList(); refreshCalc(); });
+    }
+
+    row.appendChild(targetEl); row.appendChild(diffEl);
+    row.appendChild(netEl); row.appendChild(delBtn);
+    return row;
+  }
+
+  function rebuildBdmInputList() {
+    const list = document.getElementById("bdmInputList");
+    list.innerHTML = "";
+    bdms.forEach((_, i) => list.appendChild(initBdmInputRow(i)));
+  }
+
+  /* ════════════════════════════════
+     刷新所有计算结果（不重建 input）
+  ════════════════════════════════ */
+  function refreshCalc() {
+    const total = totalArrivalQty();
+
+    /* 到货占比 */
+    document.querySelectorAll("#arrivalList .arrival-row").forEach((row, i) => {
+      const pctEl = row.children[3];
+      const qty = parseFloat(arrivals[i].qty);
+      if (!isNaN(qty) && qty > 0 && total > 0) {
+        pctEl.className = "pct-display";
+        pctEl.textContent = (qty / total * 100).toFixed(1) + "%";
+      } else {
+        pctEl.className = "pct-display dim";
+        pctEl.textContent = "—";
+      }
+    });
+
+    document.getElementById("totalArrival").textContent = total > 0 ? total : "—";
+
+    /* BDM 净目标 */
+    document.querySelectorAll("#bdmInputList .bdm-input-row").forEach((row, i) => {
+      const netEl = row.children[3];
+      const net = getBdmNet(bdms[i]);
+      if (net !== null) {
+        netEl.className = "net-display";
+        netEl.textContent = net;
+      } else {
+        netEl.className = "net-display dim";
+        netEl.textContent = "—";
+      }
+    });
+
+    /* 分配结果 */
+    const validArrivals = arrivals.filter(a => parseFloat(a.qty) > 0);
+    const validBdms = bdms.filter(b => getBdmNet(b) !== null);
+
+    const resultBlock = document.getElementById("bdmResultBlock");
+    const emptyTip = document.getElementById("bdmEmpty");
+    const cards = document.getElementById("bdmResultCards");
+
+    if (total <= 0 || validArrivals.length === 0 || validBdms.length === 0) {
+      resultBlock.style.display = "none";
+      emptyTip.style.display = "block";
+      return;
+    }
+
+    resultBlock.style.display = "block";
+    emptyTip.style.display = "none";
+
+    /* 按 BDM 数量决定是否重建卡片 */
+    const existingCards = cards.querySelectorAll(".bdm-card");
+    if (existingCards.length !== validBdms.length) {
+      cards.innerHTML = "";
+      validBdms.forEach(b => cards.appendChild(buildBdmCard(b, validArrivals, total)));
+    } else {
+      existingCards.forEach((card, i) => updateBdmCard(card, validBdms[i], validArrivals, total));
+    }
+
+    /* ── 库存剩余 ── */
+    // 每种赠品被所有 BDM 领走的总件数
+    const allocatedByGift = validArrivals.map(a => {
+      const arrQty = parseFloat(a.qty);
+      const pct = arrQty / total;
+      return validBdms.reduce((sum, b) => {
+        const net = getBdmNet(b);
+        return sum + (net !== null ? Math.floor(net * pct) : 0);
+      }, 0);
+    });
+    renderStockRemain(validArrivals, allocatedByGift);
+  }
+
+  /* ── 构建单个 BDM 卡片 ── */
+  function buildBdmCard(b, validArrivals, total) {
+    const card = document.createElement("div");
+    card.className = "bdm-card";
+
+    const header = document.createElement("div");
+    header.className = "bdm-card-header";
+    const nameEl = document.createElement("div");
+    nameEl.className = "bdm-card-name";
+    const netEl = document.createElement("div");
+    netEl.className = "bdm-card-net";
+    header.appendChild(nameEl);
+    header.appendChild(netEl);
+    card.appendChild(header);
+
+    /* 表头 */
+    const thead = document.createElement("div");
+    thead.className = "alloc-header";
+    thead.style.marginBottom = "6px";
+    ["赠品名称","占比","应领件数","箱规","应领箱数"].forEach((t, idx) => {
+      const s = document.createElement("span");
+      s.className = "col-label";
+      if (idx === 0) s.style.textAlign = "left";
+      s.textContent = t;
+      thead.appendChild(s);
+    });
+    card.appendChild(thead);
+
+    /* 行列表 */
+    const list = document.createElement("div");
+    list.className = "alloc-list";
+    validArrivals.forEach(() => {
+      const row = document.createElement("div");
+      row.className = "alloc-row";
+      for (let c = 0; c < 5; c++) {
+        const cell = document.createElement("div");
+        row.appendChild(cell);
+      }
+      list.appendChild(row);
+    });
+    card.appendChild(list);
+
+    updateBdmCard(card, b, validArrivals, total);
+    return card;
+  }
+
+  /* ── 更新单个 BDM 卡片内容 ── */
+  function updateBdmCard(card, b, validArrivals, total) {
+    const net = getBdmNet(b);
+    card.querySelector(".bdm-card-name").textContent = b.name || "未命名 BDM";
+    card.querySelector(".bdm-card-net").textContent = "净目标 " + net;
+
+    const rows = card.querySelectorAll(".alloc-row");
+    rows.forEach((row, i) => {
+      const a = validArrivals[i];
+      const arrQty = parseFloat(a.qty);
+      const pct = arrQty / total;
+      const allocQty = Math.floor(net * pct);
+      const spec = parseInt(a.spec);
+      const allocBox = (!isNaN(spec) && spec > 0) ? Math.floor(allocQty / spec) : null;
+
+      row.children[0].className = "alloc-name-cell";
+      row.children[0].textContent = a.name || "未命名";
+      row.children[0].title = a.name || "未命名";
+
+      row.children[1].className = "alloc-pct-cell";
+      row.children[1].textContent = (pct * 100).toFixed(1) + "%";
+
+      row.children[2].className = "result-pcs";
+      row.children[2].textContent = allocQty + " 件";
+
+      row.children[3].className = "alloc-spec-cell";
+      row.children[3].textContent = (!isNaN(spec) && spec > 0) ? spec + " 件/箱" : "—";
+
+      if (allocBox !== null) {
+        row.children[4].className = "result-box-val";
+        row.children[4].textContent = allocBox + " 箱";
+      } else {
+        row.children[4].className = "result-dim";
+        row.children[4].textContent = "—";
+      }
+    });
+  }
+
+  /* ════════════════════════════════
+     按钮事件
+  ════════════════════════════════ */
+  document.getElementById("btnAddArrival").addEventListener("click", () => {
+    arrivals.push({ name: "", qty: "", spec: "" });
+    document.getElementById("arrivalList").appendChild(initArrivalRow(arrivals.length - 1));
+    refreshCalc();
   });
-  var prize = 0, tierLabel = '未入围（排名超出70名）';
-  if (couponSales < 100) {
-    tierLabel = '未达参赛门槛（需累计售卖 ≥ 100 张）';
-  } else {
-    for (var i = 0; i < TIERS.length; i++) {
-      if (myRank >= TIERS[i].min && myRank <= TIERS[i].max) {
-        prize = TIERS[i].prize;
-        tierLabel = '第 ' + TIERS[i].min + '–' + TIERS[i].max + ' 名，奖金 ' + fmt(prize) + ' 元';
-        break;
+
+  document.getElementById("btnAddBdm").addEventListener("click", () => {
+    bdms.push({ name: "", target: "", diff: "", fixed: false });
+    document.getElementById("bdmInputList").appendChild(initBdmInputRow(bdms.length - 1));
+    refreshCalc();
+  });
+
+  /* ════════════════════════════════
+     初始化
+  ════════════════════════════════ */
+  rebuildArrivalList();
+  rebuildBdmInputList();
+  refreshCalc();
+</script>
+
+<!-- ══════════════════════════════════════════
+     库存剩余模块
+══════════════════════════════════════════ -->
+<style>
+  .stock-divider {
+    text-align: center;
+    font-size: 12px;
+    color: #bbb;
+    margin: 8px 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .stock-divider::before, .stock-divider::after {
+    content: ""; flex: 1;
+    height: 1px; background: #E8E0D8;
+  }
+
+  /* 库存行：赠品名 | 到货 | 已分配 | 剩余件数 | 剩余箱数 */
+  .stock-header,
+  .stock-row {
+    display: grid;
+    grid-template-columns: 1.8fr 90px 90px 100px 100px;
+    gap: 8px;
+    align-items: center;
+  }
+  @media (max-width: 600px) {
+    .stock-header,
+    .stock-row { grid-template-columns: 1fr 68px 68px 76px 76px; gap: 5px; }
+  }
+
+  .stock-list { display: flex; flex-direction: column; gap: 7px; }
+
+  .stock-name-cell {
+    font-size: 14px; font-weight: 500;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    padding: 4px 0;
+  }
+
+  .stock-num {
+    border-radius: 8px;
+    padding: 8px 8px;
+    font-size: 13px; font-weight: 600;
+    text-align: center; min-height: 36px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stock-num.arrival  { background: #F0F7EB; color: #4A6741; }
+  .stock-num.alloc    { background: #FFF3E0; color: #E65100; }
+  .stock-num.remain-ok   { background: #EDF5D6; color: #3D5A3E; font-weight: 700; }
+  .stock-num.remain-warn { background: #FDECEA; color: #C62828; font-weight: 700; }
+  .stock-num.remain-zero { background: #F5F5F5; color: #999; }
+  .stock-num.box-ok   { background: #FFF8E8; color: #7A5C1E; font-weight: 700; }
+  .stock-num.box-dim  { background: #F5F5F5; color: #bbb; }
+
+  .stock-total-row {
+    display: grid;
+    grid-template-columns: 1.8fr 90px 90px 100px 100px;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1.5px dashed #D6E8C4;
+  }
+  @media (max-width: 600px) {
+    .stock-total-row { grid-template-columns: 1fr 68px 68px 76px 76px; gap: 5px; }
+  }
+  .stock-total-label {
+    font-size: 13px; font-weight: 700; color: #4A6741;
+  }
+  .stock-total-num {
+    border-radius: 8px;
+    padding: 8px 8px;
+    font-size: 13px; font-weight: 700;
+    text-align: center; min-height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    background: #D6E8C4; color: #3D5A3E;
+  }
+</style>
+
+<div class="container" style="margin-top:0;display:none;" id="stockContainer">
+  <div class="stock-divider">普通赠品库存剩余</div>
+  <div class="card">
+    <div class="card-title">
+      <span class="step-badge" style="background:#3D5A3E;">📦</span>
+      分配后库存剩余
+    </div>
+
+    <div class="stock-header" style="margin-bottom:6px;">
+      <span class="col-label" style="text-align:left;">赠品名称</span>
+      <span class="col-label">到货数量</span>
+      <span class="col-label">已分配</span>
+      <span class="col-label">剩余件数</span>
+      <span class="col-label">剩余箱数</span>
+    </div>
+    <div class="stock-list" id="stockList"></div>
+
+    <div class="stock-total-row" id="stockTotalRow" style="display:none;">
+      <div class="stock-total-label">合计</div>
+      <div class="stock-total-num" id="stockTotalArrival">—</div>
+      <div class="stock-total-num" id="stockTotalAlloc">—</div>
+      <div class="stock-total-num" id="stockTotalRemain">—</div>
+      <div class="stock-total-num" style="background:#FFF8E8;color:#7A5C1E;" id="stockTotalBox">—</div>
+    </div>
+    <p class="hint" style="margin-top:10px;">剩余件数 = 到货数量 − 所有BDM已分配件数；剩余箱数 = ⌊剩余件数 ÷ 箱规⌋</p>
+  </div>
+</div>
+
+<script>
+  function renderStockRemain(validArrivals, allocatedByGift) {
+    const container = document.getElementById("stockContainer");
+    const list = document.getElementById("stockList");
+    const totalRow = document.getElementById("stockTotalRow");
+
+    if (!validArrivals || validArrivals.length === 0) {
+      container.style.display = "none";
+      return;
+    }
+    container.style.display = "block";
+
+    // 重建行（数量变化时）
+    const existingRows = list.querySelectorAll(".stock-row");
+    if (existingRows.length !== validArrivals.length) {
+      list.innerHTML = "";
+      validArrivals.forEach(() => {
+        const row = document.createElement("div");
+        row.className = "stock-row";
+        for (let i = 0; i < 5; i++) {
+          const cell = document.createElement("div");
+          row.appendChild(cell);
+        }
+        list.appendChild(row);
+      });
+    }
+
+    let sumArrival = 0, sumAlloc = 0, sumRemain = 0, sumBox = 0;
+    let allHaveSpec = true;
+
+    list.querySelectorAll(".stock-row").forEach((row, i) => {
+      const a = validArrivals[i];
+      const arrQty = parseFloat(a.qty);
+      const allocated = allocatedByGift[i] || 0;
+      const remain = arrQty - allocated;
+      const spec = parseInt(a.spec);
+      const remainBox = (!isNaN(spec) && spec > 0) ? Math.floor(remain / spec) : null;
+
+      // 名称
+      row.children[0].className = "stock-name-cell";
+      row.children[0].textContent = a.name || "未命名";
+      row.children[0].title = a.name || "未命名";
+
+      // 到货
+      row.children[1].className = "stock-num arrival";
+      row.children[1].textContent = arrQty + " 件";
+
+      // 已分配
+      row.children[2].className = "stock-num alloc";
+      row.children[2].textContent = allocated + " 件";
+
+      // 剩余件数
+      if (remain > 0) {
+        row.children[3].className = "stock-num remain-ok";
+        row.children[3].textContent = remain + " 件";
+      } else if (remain === 0) {
+        row.children[3].className = "stock-num remain-zero";
+        row.children[3].textContent = "0 件";
+      } else {
+        row.children[3].className = "stock-num remain-warn";
+        row.children[3].textContent = remain + " 件 ⚠️";
+      }
+
+      // 剩余箱数
+      if (remainBox !== null) {
+        row.children[4].className = remainBox > 0 ? "stock-num box-ok" : "stock-num box-dim";
+        row.children[4].textContent = remainBox + " 箱";
+      } else {
+        row.children[4].className = "stock-num box-dim";
+        row.children[4].textContent = "—";
+      }
+
+      sumArrival += arrQty;
+      sumAlloc   += allocated;
+      sumRemain  += remain;
+      if (remainBox !== null) sumBox += remainBox;
+      else allHaveSpec = false;
+    });
+
+    // 合计行
+    totalRow.style.display = "grid";
+    document.getElementById("stockTotalArrival").textContent = sumArrival + " 件";
+    document.getElementById("stockTotalAlloc").textContent   = sumAlloc + " 件";
+    document.getElementById("stockTotalRemain").textContent  = sumRemain + " 件";
+    document.getElementById("stockTotalBox").textContent     = allHaveSpec ? sumBox + " 箱" : "—";
+
+    // 合计剩余颜色
+    const remEl = document.getElementById("stockTotalRemain");
+    remEl.style.background = sumRemain > 0 ? "#D6E8C4" : sumRemain === 0 ? "#F5F5F5" : "#FDECEA";
+    remEl.style.color       = sumRemain > 0 ? "#3D5A3E" : sumRemain === 0 ? "#999"    : "#C62828";
+  }
+</script>
+
+<!-- ══════════════════════════════════════════
+     特殊赠品分配模块（独立，不依赖上方数据）
+══════════════════════════════════════════ -->
+<style>
+  .sp-divider {
+    text-align: center;
+    font-size: 12px;
+    color: #bbb;
+    margin: 8px 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sp-divider::before, .sp-divider::after {
+    content: ""; flex: 1;
+    height: 1px; background: #E8E0D8;
+  }
+
+  /* 总数 + 赠品名 输入区 */
+  .sp-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 480px) { .sp-top-grid { grid-template-columns: 1fr; } }
+
+  /* BDM 行：姓名 | 在职人数 | 分配数量 */
+  .sp-bdm-header,
+  .sp-bdm-row {
+    display: grid;
+    grid-template-columns: 1.6fr 110px 110px;
+    gap: 8px;
+    align-items: center;
+  }
+  @media (max-width: 480px) {
+    .sp-bdm-header,
+    .sp-bdm-row { grid-template-columns: 1fr 80px 80px; gap: 5px; }
+  }
+
+  .sp-bdm-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .sp-result {
+    background: #EDF5D6;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px; font-weight: 700; color: #3D5A3E;
+    text-align: center; min-height: 38px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sp-result.dim { background: #f5f5f5; color: #bbb; font-weight: 400; }
+
+  .sp-name-fixed {
+    font-size: 14px;
+    padding: 8px 10px;
+    background: #F7FBF2;
+    border: 1.5px solid #D6E8C4;
+    border-radius: 8px;
+    color: #3D5A3E;
+    font-weight: 500;
+    min-height: 38px;
+    display: flex; align-items: center;
+  }
+
+  .sp-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #F0F7EB;
+    border-radius: 10px;
+    padding: 11px 16px;
+    margin-top: 14px;
+    border: 1px solid #D6E8C4;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .sp-summary-item { font-size: 12px; color: #4A6741; font-weight: 600; }
+  .sp-summary-item span { font-size: 18px; font-weight: 800; color: #3D5A3E; margin: 0 3px; }
+  .sp-warn { font-size: 12px; color: #c0756a; margin-top: 8px; display: none; }
+  .sp-warn.show { display: block; }
+
+  .sp-extra-section { margin-top: 14px; border-top: 1px dashed #D6E8C4; padding-top: 12px; }
+  .sp-extra-label { font-size: 12px; color: #999; margin-bottom: 8px; }
+</style>
+
+<div class="container" style="margin-top:0;">
+  <div class="sp-divider">特殊赠品分配（按在职人数比例）</div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="step-badge" style="background:#7A5C1E;">★</span>
+      特殊赠品分配
+    </div>
+
+    <!-- 总数量 + 赠品名称 -->
+    <div class="sp-top-grid">
+      <div class="field-group">
+        <label>特殊赠品总数量（件）</label>
+        <input type="number" id="spTotal" placeholder="例：50" min="0" />
+      </div>
+      <div class="field-group">
+        <label>赠品名称（选填）</label>
+        <input type="text" id="spGiftName" placeholder="例：定制礼盒" />
+      </div>
+    </div>
+
+    <!-- BDM 列表 -->
+    <div class="sp-bdm-header" style="margin-bottom:6px;">
+      <span class="col-label" style="text-align:left;">BDM 姓名</span>
+      <span class="col-label">在职人数</span>
+      <span class="col-label">分配数量</span>
+    </div>
+    <div class="sp-bdm-list" id="spBdmList"></div>
+
+    <!-- 额外 BDM -->
+    <div class="sp-extra-section">
+      <div class="sp-extra-label">其他 BDM（选填）</div>
+      <div class="sp-bdm-list" id="spExtraList"></div>
+      <button class="btn-add" id="btnAddSpExtra" style="margin-top:8px;">＋ 添加其他 BDM</button>
+    </div>
+
+    <!-- 汇总 -->
+    <div class="sp-summary">
+      <div class="sp-summary-item">总在职人数：<span id="spTotalStaff">—</span> 人</div>
+      <div class="sp-summary-item">已分配：<span id="spAllocated">—</span> 件</div>
+      <div class="sp-summary-item">剩余：<span id="spRemain">—</span> 件</div>
+    </div>
+    <div class="sp-warn" id="spWarn"></div>
+  </div>
+</div>
+
+<script>
+  /* ════════════════════════════════
+     特殊赠品分配
+  ════════════════════════════════ */
+  const SP_FIXED_NAMES = ["姬羽茜","陈启韵","张义强","段兆烜","刘麒麟","秦亚辉","桑亚东","李锦辉","熊小忠"];
+
+  // 固定 BDM 数据
+  let spBdms = SP_FIXED_NAMES.map(name => ({ name, staff: "" }));
+  // 额外 BDM 数据
+  let spExtras = [];
+
+  /* ── 初始化固定 BDM 行（只建一次） ── */
+  function initSpBdmRow(i, isExtra) {
+    const data = isExtra ? spExtras : spBdms;
+    const row = document.createElement("div");
+    row.className = "sp-bdm-row";
+
+    // 姓名
+    if (isExtra) {
+      const nameEl = document.createElement("input");
+      nameEl.type = "text"; nameEl.placeholder = "姓名";
+      nameEl.value = data[i].name;
+      nameEl.addEventListener("input", e => { spExtras[i].name = e.target.value; spRefreshCalc(); });
+      row.appendChild(nameEl);
+    } else {
+      const nameEl = document.createElement("div");
+      nameEl.className = "sp-name-fixed";
+      nameEl.textContent = data[i].name;
+      row.appendChild(nameEl);
+    }
+
+    // 在职人数
+    const staffEl = document.createElement("input");
+    staffEl.type = "number"; staffEl.placeholder = "人数"; staffEl.min = "0";
+    staffEl.value = data[i].staff;
+    staffEl.addEventListener("input", e => {
+      data[i].staff = e.target.value;
+      spRefreshCalc();
+    });
+    row.appendChild(staffEl);
+
+    // 分配数量（只读展示）
+    const resultEl = document.createElement("div");
+    resultEl.className = "sp-result dim";
+    resultEl.textContent = "—";
+    row.appendChild(resultEl);
+
+    // 额外行有删除按钮
+    if (isExtra) {
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn-remove"; delBtn.innerHTML = "×";
+      delBtn.style.cssText = "width:32px;height:32px;";
+      delBtn.addEventListener("click", () => {
+        spExtras.splice(i, 1);
+        rebuildSpExtraList();
+        spRefreshCalc();
+      });
+      row.style.gridTemplateColumns = "1.6fr 110px 110px 36px";
+      row.appendChild(delBtn);
+    }
+
+    return row;
+  }
+
+  function rebuildSpBdmList() {
+    const list = document.getElementById("spBdmList");
+    list.innerHTML = "";
+    spBdms.forEach((_, i) => list.appendChild(initSpBdmRow(i, false)));
+  }
+
+  function rebuildSpExtraList() {
+    const list = document.getElementById("spExtraList");
+    list.innerHTML = "";
+    spExtras.forEach((_, i) => list.appendChild(initSpBdmRow(i, true)));
+  }
+
+  /* ── 刷新计算（不重建 input） ── */
+  function spRefreshCalc() {
+    const total = parseFloat(document.getElementById("spTotal").value);
+    const allData = [
+      ...spBdms.map((b, i) => ({ ...b, listId: "spBdmList", rowIdx: i })),
+      ...spExtras.map((b, i) => ({ ...b, listId: "spExtraList", rowIdx: i })),
+    ];
+
+    // 总在职人数
+    const totalStaff = allData.reduce((s, b) => {
+      const v = parseFloat(b.staff);
+      return s + (isNaN(v) ? 0 : v);
+    }, 0);
+
+    document.getElementById("spTotalStaff").textContent = totalStaff > 0 ? totalStaff : "—";
+
+    // 更新每行分配数量
+    const fixedRows  = document.querySelectorAll("#spBdmList .sp-bdm-row");
+    const extraRows  = document.querySelectorAll("#spExtraList .sp-bdm-row");
+
+    let totalAllocated = 0;
+
+    function updateRow(row, staffStr) {
+      const resultEl = row.children[row.children.length - (row.children.length === 4 ? 2 : 1)];
+      // 固定行：children[2]；额外行：children[2]（删除按钮是children[3]）
+      const resEl = isNaN(parseFloat(staffStr)) ? row.children[2] : row.children[2];
+
+      const staff = parseFloat(staffStr);
+      if (!isNaN(total) && total > 0 && !isNaN(staff) && staff > 0 && totalStaff > 0) {
+        const alloc = Math.round(total * staff / totalStaff);
+        resEl.className = "sp-result";
+        resEl.textContent = alloc + " 件";
+        totalAllocated += alloc;
+      } else {
+        resEl.className = "sp-result dim";
+        resEl.textContent = "—";
       }
     }
+
+    fixedRows.forEach((row, i) => updateRow(row, spBdms[i].staff));
+    extraRows.forEach((row, i) => updateRow(row, spExtras[i].staff));
+
+    // 汇总
+    const remain = (!isNaN(total) && total > 0 && totalStaff > 0)
+      ? total - totalAllocated : null;
+
+    document.getElementById("spAllocated").textContent =
+      (totalAllocated > 0) ? totalAllocated : "—";
+    document.getElementById("spRemain").textContent =
+      remain !== null ? remain : "—";
+
+    // 警告：四舍五入后总数可能与输入不等
+    const warn = document.getElementById("spWarn");
+    if (remain !== null && remain !== 0) {
+      warn.textContent = `⚠️ 四舍五入后合计 ${totalAllocated} 件，与总数 ${total} 件相差 ${Math.abs(remain)} 件，可手动调整`;
+      warn.classList.add("show");
+    } else {
+      warn.classList.remove("show");
+    }
   }
-  var h = couponSales < 100
-    ? '<div class="alert alert-warn">&#x26A0;&#xFE0F; 累计售卖 ' + couponSales + ' 张，未达 100 张参赛门槛</div>'
-    : '<div class="alert alert-ok">&#x2705; 已达参赛门槛（累计售卖 ' + couponSales + ' 张）</div>';
-  h += '<div class="result-row"><span class="rl">团购券累计售卖</span><span class="rv">' + couponSales + ' 张</span></div>';
-  h += '<div class="result-row"><span class="rl">预估排名</span><span class="rv">第 ' + myRank + ' 名</span></div>';
-  h += '<div class="result-row"><span class="rl">所在梯度</span><span class="rv">' + tierLabel + '</span></div>';
-  h += '<div class="result-row hl-purple"><span class="rl">&#x1F4B0; 激励赛奖金</span><span class="rv">' + fmt(prize) + ' 元</span></div>';
-  $('incentiveResult').innerHTML = h;
-  return prize;
-}
 
-function calcAll() {
-  var salary     = calcSalary();
-  var commission = calcCommission(false);
-  var incentive  = calcIncentive();
-  var total      = salary + commission + incentive;
-  $('tcAmount').innerHTML = fmt(total) + '<span class="unit">元</span>';
-  $('tcSalary').textContent     = fmt(salary)     + ' 元';
-  $('tcCommission').textContent = fmt(commission)  + ' 元';
-  $('tcIncentive').textContent  = fmt(incentive)   + ' 元';
-  $('progressBar').style.width  = Math.min(100, Math.round(total / 15000 * 100)) + '%';
-  var msg = total >= 15000 ? '&#x1F525; 超神！你就是团队的传说！'
-          : total >= 10000 ? '&#x1F4AA; 干得漂亮，继续冲！'
-          : total >= 6000  ? '&#x1F44D; 不错，还有提升空间！'
-          : '&#x1F4A1; 加油，好好搞钱！';
-  $('tcMsg').innerHTML = msg;
-}
+  /* ── 事件 ── */
+  document.getElementById("spTotal").addEventListener("input", spRefreshCalc);
+  document.getElementById("spGiftName").addEventListener("input", () => {});
 
-window.addEventListener('DOMContentLoaded', calcAll);
+  document.getElementById("btnAddSpExtra").addEventListener("click", () => {
+    spExtras.push({ name: "", staff: "" });
+    const list = document.getElementById("spExtraList");
+    list.appendChild(initSpBdmRow(spExtras.length - 1, true));
+    spRefreshCalc();
+  });
+
+  /* ── 初始化 ── */
+  rebuildSpBdmList();
+  rebuildSpExtraList();
+  spRefreshCalc();
 </script>
 </body>
 </html>
